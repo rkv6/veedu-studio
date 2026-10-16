@@ -117,3 +117,64 @@ form .btn { justify-self: start; }
   .win { animation: none; fill: #f2c76e; }
   .btn, .top nav a { transition: none; }
 }
+
+/* Cassette tape scroll */
+html { scrollbar-gutter: stable; }
+.tape { position: relative; }
+.tape-pin { position: relative; height: 100svh; min-height: 620px; overflow: hidden; }
+.tape-title { position: absolute; left: var(--gutter); top: 6.5rem; max-width: min(26rem, 44vw); z-index: 2; }
+.tape-title h2 { font-size: clamp(2.2rem, 4vw, 3.4rem); }
+.tape-hint { margin-top: 1rem; color: var(--soft); transition: opacity .3s; }
+.cassette { position: absolute; right: var(--gutter); top: 5.6rem; width: clamp(230px, min(34vw, 55vh), 440px); z-index: 3; filter: drop-shadow(0 18px 22px rgba(31,27,23,.28)); }
+.cassette-svg { display: block; width: 100%; height: auto; }
+.tape-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; overflow: visible; filter: drop-shadow(0 12px 14px rgba(31,27,23,.3)); }
+.tape-lane { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.tape-item { position: absolute; left: 0; top: 0; opacity: 0; display: flex; flex-direction: column; justify-content: center; gap: .15rem; padding: 0 1.6rem; color: var(--lime); text-decoration: none; will-change: transform, opacity; }
+a.tape-item:hover .t-name, a.tape-item:focus-visible .t-name { color: var(--brass); }
+.t-date { color: var(--brass); font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.t-name { font: clamp(1.7rem, 2.7vw, 2.6rem)/1.05 var(--serif); transition: color .2s; }
+.t-meta { font-size: .88rem; color: color-mix(in srgb, var(--lime) 75%, #241b16); }
+.t-link { margin-top: .3rem; font-size: .88rem; font-weight: 600; text-decoration: underline; text-underline-offset: .25em; text-decoration-color: var(--brass); }
+.tape-end { align-items: flex-start; gap: .8rem; }
+.t-cta { pointer-events: auto; display: inline-flex; background: var(--brass); color: var(--ink); font-weight: 700; padding: .75rem 1.2rem; border-radius: 999px; text-decoration: none; }
+.sr-list { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); margin: 0; padding: 0; z-index: 5; }
+.sr-list:focus-within { width: auto; height: auto; clip-path: none; left: var(--gutter); bottom: 1rem; padding: 1rem 1.4rem; background: var(--lime); border-radius: 14px; box-shadow: var(--shadow); }
+.sr-list a { display: block; padding: .3rem 0; }
+.tape-list { display: grid; gap: 1rem; }
+.tape-list a { display: grid; gap: .2rem; background: #2b211b; color: var(--lime); padding: 1.3rem 1.5rem; border-radius: 10px; text-decoration: none; }
+.tape-list .t-name { font-size: 1.8rem; }
+
+/* Project detail dialog */
+.detail { border: 0; padding: 0; width: min(920px, calc(100% - 2rem)); max-height: calc(100svh - 2rem); border-radius: 24px; background: var(--lime); color: var(--ink); overflow: auto; overscroll-behavior: contain; box-shadow: 0 30px 80px rgba(31,27,23,.45); }
+.detail::backdrop { background: rgba(31,27,23,.62); backdrop-filter: blur(3px); }
+.detail[open] { animation: rise .45s cubic-bezier(.16,1,.3,1); }
+@keyframes rise { from { opacity: 0; transform: translateY(18px) scale(.98); } }
+.detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+.detail-art { min-height: 100%; background: #e7dcc8; }
+.detail-art .art { height: 100%; min-height: 300px; object-fit: cover; }
+.detail-body { position: relative; padding: clamp(1.4rem, 3vw, 2.4rem); display: grid; gap: 1rem; align-content: start; }
+.detail-close { position: absolute; top: .9rem; right: .9rem; width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--ink) 30%, transparent); background: transparent; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--ink); }
+.detail-close:hover { background: var(--ink); color: var(--lime); }
+.detail-body h3 { font-size: 2.4rem; padding-right: 2.6rem; }
+.detail-body .where { margin: 0; }
+.detail-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem 1.2rem; margin: 0; padding: 1rem 0; border-block: 1px solid color-mix(in srgb, var(--ink) 15%, transparent); }
+.detail-facts dt { font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); }
+.detail-facts dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.detail-brief { color: var(--soft); }
+.detail-list { display: grid; gap: .45rem; }
+.detail-list li { padding-left: 1.2rem; position: relative; }
+.detail-list li::before { content: ''; position: absolute; left: 0; top: .65em; width: 6px; height: 6px; border-radius: 50%; background: var(--laterite); }
+.detail .btn { justify-self: start; margin-top: .4rem; }
+
+@media (max-width: 760px) {
+  .tape-title { top: 4.6rem; max-width: calc(100% - 2 * var(--pad)); }
+  .tape-title h2 { font-size: 1.9rem; }
+  .tape-hint { font-size: .9rem; margin-top: .5rem; }
+  .cassette { top: 11.4rem; width: 58vw; min-width: 0; right: -4vw; }
+  .t-name { font-size: 1.5rem; }
+  .t-meta { font-size: .8rem; }
+  .tape-item { padding: 0 1.1rem; }
+  .detail-grid { grid-template-columns: minmax(0, 1fr); }
+  .detail-art .art { min-height: 0; aspect-ratio: 4 / 3; }
+}
+@media (prefers-reduced-motion: reduce) { .detail[open] { animation: none; } }

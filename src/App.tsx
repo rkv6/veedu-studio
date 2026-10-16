@@ -1,27 +1,58 @@
-import { useMemo, useState, type FormEvent } from 'react'
-import { HouseArt, PlanArt, RoomArt } from './Art'
-import { budgetBands, formatPrice, listings, projectFilters, projects, steps, typeFilters, type HomeType, type RoomKind } from './data'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { HouseArt, PlanArt } from './Art'
+import { TapeReel } from './TapeReel'
+import { ProjectDialog } from './ProjectDialog'
+import { budgetBands, formatPrice, listings, projects, steps, typeFilters, type HomeType, type Project } from './data'
 
 const PORTFOLIO = 'https://portfolio-rkv6.vercel.app/'
 
 export default function App() {
-  const [pf, setPf] = useState<'all' | RoomKind>('all')
   const [tf, setTf] = useState<'All' | HomeType>('All')
   const [bf, setBf] = useState('any')
   const [interest, setInterest] = useState('Both')
   const [property, setProperty] = useState('')
   const [errors, setErrors] = useState<{ name?: string; phone?: string }>({})
 
-  const shownProjects = projects.filter((p) => pf === 'all' || p.kind === pf)
+  const [openId, setOpenId] = useState<string | null>(null)
+  const pushed = useRef(false)
+  const idFromHash = () => {
+    const m = window.location.hash.match(/^#project-(.+)$/)
+    return m && projects.some((p) => p.id === m[1]) ? m[1] : null
+  }
+  useEffect(() => {
+    setOpenId(idFromHash())
+    const on = () => setOpenId(idFromHash())
+    window.addEventListener('popstate', on)
+    return () => window.removeEventListener('popstate', on)
+  }, [])
+  useEffect(() => {
+    document.documentElement.style.overflow = openId ? 'hidden' : ''
+  }, [openId])
+  const openProject = (id: string) => {
+    window.history.pushState(null, '', `#project-${id}`)
+    pushed.current = true
+    setOpenId(id)
+  }
+  const closeProject = () => {
+    if (!idFromHash()) { setOpenId(null); return }
+    if (pushed.current) { pushed.current = false; window.history.back() }
+    else { window.history.replaceState(null, '', window.location.pathname + window.location.search); setOpenId(null) }
+  }
+  const openProjectData = projects.find((p) => p.id === openId) ?? null
+
   const shownHomes = useMemo(() => {
     const band = budgetBands.find((b) => b.id === bf)!
     return listings.filter((l) => (tf === 'All' || l.type === tf) && band.test(l.lakh))
   }, [tf, bf])
 
-  function enquire(label: string) {
+  function enquire(label: string, kind = 'Buy a home') {
     setProperty(label)
-    setInterest('Buy a home')
+    setInterest(kind)
     document.getElementById('enquire')?.scrollIntoView({ behavior: 'smooth' })
+  }
+  function enquireProject(p: Project) {
+    closeProject()
+    window.setTimeout(() => enquire(`Something like ${p.name}, ${p.place}`, 'Interior design'), 160)
   }
 
   function submit(e: FormEvent<HTMLFormElement>) {
@@ -73,29 +104,7 @@ export default function App() {
           <div className="hero-art"><HouseArt /></div>
         </section>
 
-        <section className="block" id="projects" aria-labelledby="h-projects">
-          <div className="head">
-            <h2 id="h-projects">Interiors we have finished</h2>
-            <div className="chips" role="group" aria-label="Filter projects">
-              {projectFilters.map((f) => (
-                <button key={f.id} className="chip" aria-pressed={pf === f.id} onClick={() => setPf(f.id)}>{f.label}</button>
-              ))}
-            </div>
-          </div>
-          <ul className="projects">
-            {shownProjects.map((p) => (
-              <li key={p.id} className="project">
-                <div className="frame"><RoomArt kind={p.kind} /></div>
-                <div className="project-body">
-                  <h3>{p.name}</h3>
-                  <p className="where">{p.place}, {p.scope}</p>
-                  <p>{p.note}</p>
-                  <p className="facts"><span>{p.area}</span><span>{p.budget}</span></p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <TapeReel onOpen={openProject} />
 
         <section className="block tint" id="homes" aria-labelledby="h-homes">
           <div className="head">
@@ -194,6 +203,8 @@ export default function App() {
           </form>
         </section>
       </main>
+
+      <ProjectDialog project={openProjectData} onClose={closeProject} onEnquire={enquireProject} />
 
       <footer className="foot">
         <p><strong>Veedu Studio</strong>, Thiruvananthapuram. A concept site for a fictional studio: the homes, prices and projects are made up.</p>
