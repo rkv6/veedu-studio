@@ -148,11 +148,16 @@ export default function App() {
         </section>
 
         <section className="block studio" id="studio" aria-labelledby="h-studio">
-          <h2 id="h-studio">One team from the first sketch to the last switch</h2>
-          <div className="studio-cols">
+          <div className="studio-main">
+            <h2 id="h-studio">One team from the first sketch to the last switch</h2>
             <p>Most families hire a designer, then a contractor, then an electrician, and spend the year carrying messages between them. We keep the drawing, the carpenters and the site supervisor under one roof, so the room you approve is the room you get.</p>
             <p>The same team helps you find the home. We have walked the apartments, villas and plots listed here and can tell you what the brochure leaves out: where the water pressure drops, which side gets the monsoon, what a wall can and cannot take.</p>
           </div>
+          <ul className="services">
+            <li><h3>Interior design</h3><p>Rooms, kitchens and whole homes, drawn and built by one team.</p></li>
+            <li><h3>Home search</h3><p>Apartments, villas and plots we have walked, with the honest notes.</p></li>
+            <li><h3>Site supervision</h3><p>A weekly progress report and one person to call when something is off.</p></li>
+          </ul>
         </section>
 
         <section className="block night" id="process" aria-labelledby="h-process">
@@ -167,7 +172,12 @@ export default function App() {
         <section className="block enquire" id="enquire" aria-labelledby="h-enq">
           <div className="enq-copy">
             <h2 id="h-enq">Tell us about the home</h2>
-            <p>Send a few details and the conversation opens in WhatsApp, ready to send. We reply the same day with a time for a site visit.</p>
+            <p>Send a few details and the conversation opens in WhatsApp, ready to send.</p>
+            <ul className="next">
+              <li><strong>The same day</strong><span>We reply on WhatsApp with a time for a site visit.</span></li>
+              <li><strong>Within a week</strong><span>We visit, measure and listen to how you live.</span></li>
+              <li><strong>In ten days</strong><span>You get a written plan with materials and prices.</span></li>
+            </ul>
           </div>
           <form onSubmit={submit} noValidate>
             <div className="row">

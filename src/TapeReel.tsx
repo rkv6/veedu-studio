@@ -33,6 +33,9 @@ export function TapeReel({ onOpen }: { onOpen: (id: string) => void }) {
   const svg = useRef<SVGSVGElement>(null)
   const items = useRef<(HTMLElement | null)[]>([])
   const hint = useRef<HTMLParagraphElement>(null)
+  const fill = useRef<HTMLSpanElement>(null)
+  const stops = useRef<(HTMLButtonElement | null)[]>([])
+  const trigger = useRef<ScrollTrigger | null>(null)
 
   useEffect(() => {
     if (reduced) return
@@ -47,6 +50,7 @@ export function TapeReel({ onOpen }: { onOpen: (id: string) => void }) {
     const reelLSpin = cassetteEl.querySelector<SVGGElement>('.reel-l-spin')!
     const reelRSpin = cassetteEl.querySelector<SVGGElement>('.reel-r-spin')!
     const els = items.current.filter(Boolean) as HTMLElement[]
+    let active = -1
 
     const st = { target: 0, p: 0, prev: 0, flutter: 0 }
     let W = 0, H = 0, D = 0, S = 0, itemW = 0, tapeH = 0, laneY = 0, xExit = 0, exitY = 0, mobile = false
@@ -150,11 +154,17 @@ export function TapeReel({ onOpen }: { onOpen: (id: string) => void }) {
       reelLSpin.setAttribute('transform', `rotate(${(-a * 260).toFixed(1)})`)
       reelRSpin.setAttribute('transform', `rotate(${(-a * 260 * 1.6).toFixed(1)})`)
       if (hint.current) hint.current.style.opacity = `${1 - clamp(a * 4)}`
+      if (fill.current) fill.current.style.transform = `scaleX(${(a / n).toFixed(4)})`
+      const now = Math.round(a)
+      if (now !== active) {
+        active = now
+        stops.current.forEach((b, i) => b?.setAttribute('aria-current', i === now ? 'true' : 'false'))
+      }
     }
 
     const ctx = gsap.context(() => {
       measure()
-      ScrollTrigger.create({
+      trigger.current = ScrollTrigger.create({
         trigger: pinEl,
         start: 'top top',
         end: () => `+=${Math.round(window.innerHeight * (n * 0.95 + 0.4))}`,
@@ -227,6 +237,15 @@ export function TapeReel({ onOpen }: { onOpen: (id: string) => void }) {
             <a className="t-cta" href="#enquire" tabIndex={-1}>Start an enquiry →</a>
           </div>
         </div>
+        <nav className="rail" aria-label="Tape position">
+          <span className="rail-line"><span className="rail-fill" ref={fill} /></span>
+          {[...projects.map((p) => p.done.replace(/^(\w{3})\w*/, '$1')), 'The end'].map((label, i) => (
+            <button key={label + i} ref={(el) => { stops.current[i] = el }} aria-label={i < n ? `Jump to ${projects[i].name}` : 'Jump to the end of the tape'}
+              onClick={() => { const t = trigger.current; if (t) window.scrollTo({ top: t.start + (t.end - t.start) * (i / n), behavior: 'smooth' }) }}>
+              <i />{label}
+            </button>
+          ))}
+        </nav>
         <ul className="sr-list" aria-label="Finished projects">
           {projects.map((p) => (
             <li key={p.id}><a href={`#project-${p.id}`} onClick={open(onOpen, p.id)}>{p.name}, {p.done}</a></li>
