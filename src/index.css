@@ -312,3 +312,25 @@ form { background: var(--paper); }
 
 .hero { overflow-x: clip; }
 .hero-art { overflow: visible; padding: 0 8px 8px 0; }
+
+/* Pluck cards: a tilted print on the empty side of each stop, running off the screen edge */
+.unreel { --g: max(var(--pad), calc((100vw - 1320px) / 2 + var(--pad))); }
+.u-card { display: flex; align-items: center; pointer-events: none; min-width: 0; }
+.u-card.at-right { grid-column: 3; justify-content: flex-start; }
+.u-card.at-left { grid-column: 1; justify-content: flex-end; }
+.u-card-in {
+  --rot: 8deg; --off: 1;
+  width: clamp(230px, 25vw, 340px); background: var(--paper); border: var(--edge); border-radius: 8px; box-shadow: var(--hard-lg); padding: .7rem .7rem 1rem; position: relative;
+  opacity: 0; transform: translateX(calc(var(--off) * (var(--g) + 18%) + var(--off) * 90px)) rotate(var(--rot));
+  transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1);
+}
+.u-card.at-right .u-card-in { margin-left: clamp(2rem, 6vw, 5rem); }
+.u-card.at-left .u-card-in { --rot: -8deg; --off: -1; margin-right: clamp(2rem, 6vw, 5rem); }
+.u-item.in + .u-card .u-card-in { opacity: 1; transform: translateX(calc(var(--off) * (var(--g) + 20%))) rotate(var(--rot)); }
+.u-card-in::before { content: ''; position: absolute; top: .55rem; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--lime); border: 2px solid var(--ink); z-index: 2; }
+.u-card-art { border: var(--edge); border-radius: 4px; overflow: hidden; aspect-ratio: 4 / 3; background: var(--lime2); }
+.u-card-art .art { display: block; width: 100%; height: 100%; }
+.u-card-name { margin-top: .8rem; font: 900 1.15rem/1 var(--display); font-stretch: 112%; text-transform: uppercase; letter-spacing: -.01em; }
+.u-card-sub { margin-top: .3rem; font-size: .88rem; color: var(--soft); }
+@media (max-width: 759px) { .u-card { display: none; } }
+@media (prefers-reduced-motion: reduce) { .u-card-in { transition: none; opacity: 1; } }

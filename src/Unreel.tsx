@@ -1,4 +1,4 @@
-import { useRef, type PointerEvent } from 'react'
+import { Fragment, useRef, type PointerEvent } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { scrollByY } from './smooth'
@@ -6,6 +6,7 @@ import { SplitHeading } from './SplitHeading'
 
 gsap.registerPlugin(useGSAP)
 import { projects } from './data'
+import { RoomArt } from './Art'
 
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v))
 const smooth = (t: number) => { const c = clamp(t); return c * c * (3 - 2 * c) }
@@ -83,7 +84,8 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
       ys.forEach((y, k) => {
         const t = y - y0
         const pin = smooth(t / 170)
-        let sway = (A * Math.sin(t * 0.012 - time * 2.4) + A * 0.5 * Math.sin(t * 0.031 + time * 1.7)) * pin
+        // One-sided: the tape only ever bows to the right while it is pulled, it never swings back across the centre line
+        let sway = (reduced ? 0 : A * (0.62 + 0.38 * Math.sin(t * 0.012 - time * 2.4)) + A * 0.18 * Math.sin(t * 0.031 + time * 1.7)) * pin
         const c = clamp((y - (hd - 110)) / 110)
         sway += (reduced ? 0 : 1) * c * c * (12 + 30 * s.flutter)
         const twist = reduced ? 1 : 0.55 + 0.45 * Math.abs(Math.cos(t * 0.009 - time * 0.9 + 0.7))
@@ -186,15 +188,24 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
 
       <ol className="unreel-list">
         {projects.map((p, i) => (
-          <li key={p.id} className={`u-item ${i % 2 ? 'right' : 'left'}`} style={{ gridRow: i + 1 }} ref={(el) => { items.current[i] = el }}>
-            <a href={`#project-${p.id}`} onClick={open(p.id)}>
-              <span className="u-name">{p.name}</span>
-              <span className="u-date">{p.done}</span>
-              <span className="u-meta">{p.place}, {p.scope}, {p.took}</span>
-              <span className="u-note">{p.note}</span>
-              <span className="u-link">See the whole story →</span>
-            </a>
-          </li>
+          <Fragment key={p.id}>
+            <li className={`u-item ${i % 2 ? 'right' : 'left'}`} style={{ gridRow: i + 1 }} ref={(el) => { items.current[i] = el }}>
+              <a href={`#project-${p.id}`} onClick={open(p.id)}>
+                <span className="u-name">{p.name}</span>
+                <span className="u-date">{p.done}</span>
+                <span className="u-meta">{p.place}, {p.scope}, {p.took}</span>
+                <span className="u-note">{p.note}</span>
+                <span className="u-link">See the whole story →</span>
+              </a>
+            </li>
+            <li className={`u-card ${i % 2 ? 'at-left' : 'at-right'}`} style={{ gridRow: i + 1 }} aria-hidden="true">
+              <div className="u-card-in">
+                <div className="u-card-art"><RoomArt kind={p.kind} /></div>
+                <p className="u-card-name">{p.name}</p>
+                <p className="u-card-sub">Keys handed over, {p.done}</p>
+              </div>
+            </li>
+          </Fragment>
         ))}
       </ol>
 
