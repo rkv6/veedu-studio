@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { HouseArt, PlanArt } from './Art'
-import { TapeReel } from './TapeReel'
+import { Unreel } from './Unreel'
+import { Intro } from './Intro'
 import { ProjectDialog } from './ProjectDialog'
 import { budgetBands, formatPrice, listings, projects, steps, typeFilters, type HomeType, type Project } from './data'
 
@@ -13,6 +14,11 @@ export default function App() {
   const [property, setProperty] = useState('')
   const [errors, setErrors] = useState<{ name?: string; phone?: string }>({})
 
+  const [intro, setIntro] = useState(() => {
+    try {
+      return !window.matchMedia('(prefers-reduced-motion: reduce)').matches && !window.sessionStorage.getItem('veedu-intro')
+    } catch { return false }
+  })
   const [openId, setOpenId] = useState<string | null>(null)
   const pushed = useRef(false)
   const idFromHash = () => {
@@ -79,6 +85,7 @@ export default function App() {
 
   return (
     <>
+      {intro && <Intro onDone={() => setIntro(false)} />}
       <a className="skip" href="#projects">Skip to projects</a>
       <header className="top">
         <a className="mark" href="#top" aria-label="Veedu Studio, home"><span>Veedu</span><small>Studio</small></a>
@@ -104,11 +111,11 @@ export default function App() {
           <div className="hero-art"><HouseArt /></div>
         </section>
 
-        <TapeReel onOpen={openProject} />
+        <Unreel onOpen={openProject} />
 
         <section className="block tint" id="homes" aria-labelledby="h-homes">
           <div className="head">
-            <h2 id="h-homes">Homes we can show you</h2>
+            <h2 id="h-homes">Homes waiting for a family</h2>
             <div className="filters">
               <div className="chips" role="group" aria-label="Home type">
                 {typeFilters.map((t) => (
@@ -161,7 +168,7 @@ export default function App() {
         </section>
 
         <section className="block night" id="process" aria-labelledby="h-process">
-          <h2 id="h-process">How a project runs</h2>
+          <h2 id="h-process">How we roll</h2>
           <ol className="steps">
             {steps.map((s) => (
               <li key={s.title}><h3>{s.title}</h3><p>{s.text}</p></li>
@@ -171,7 +178,7 @@ export default function App() {
 
         <section className="block enquire" id="enquire" aria-labelledby="h-enq">
           <div className="enq-copy">
-            <h2 id="h-enq">Tell us about the home</h2>
+            <h2 id="h-enq">Tell us what you are dreaming up</h2>
             <p>Send a few details and the conversation opens in WhatsApp, ready to send.</p>
             <ul className="next">
               <li><strong>The same day</strong><span>We reply on WhatsApp with a time for a site visit.</span></li>
