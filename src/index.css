@@ -277,3 +277,38 @@ h3 { font-size: 1.4rem; line-height: 1.05; }
 .sketchbook .ink.thin { stroke-width: 1; }
 .sketchbook .wash { stroke: none; }
 @media (max-width: 960px) { .hero-art { height: 460px; } }
+
+/* Loom & Leaf treatment: 2px ink borders, square corners, hard offset shadows, hang-tag cards */
+:root { --hard: 3px 3px 0 var(--ink); --hard-lg: 5px 5px 0 var(--ink); --edge: 2px solid var(--ink); --paper: #f6f7f1; }
+.btn { min-height: 48px; padding: .7rem 1.5rem; border: var(--edge); border-radius: 2px; font-weight: 700; color: var(--lime); background: var(--laterite); box-shadow: var(--hard); transition: transform .2s cubic-bezier(.22,1,.36,1), box-shadow .2s, background-color .2s, color .2s; }
+.btn:hover { background: var(--laterite-d); border-color: var(--ink); transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+.btn-ghost:hover { background: var(--ink); color: var(--lime); }
+.btn-sm { min-height: 40px; padding: .5rem 1rem; }
+.top .btn { box-shadow: var(--hard); }
+.chip { border: var(--edge); font-weight: 600; }
+.select select, form select, form input, form textarea { border: var(--edge); border-radius: 4px; background: #fff; }
+
+.home, .services li, form, .sketchbook .tile { border: var(--edge); border-radius: 8px; box-shadow: var(--hard-lg); }
+.home, .services li { background: var(--paper); }
+.sketchbook .tile.tall { border-radius: 8px; }
+.home { position: relative; transform-origin: 50% 0; padding-top: 0; }
+.home:hover { transform: translate(-1px, -2px) rotate(-.8deg); box-shadow: 7px 7px 0 var(--ink); }
+.home::before { content: ''; position: absolute; z-index: 2; left: 50%; top: .6rem; width: .95rem; height: .95rem; margin-left: -.475rem; border-radius: 50%; background: var(--brass); border: var(--edge); }
+.plan-wrap { padding-top: 2rem; border-bottom: var(--edge); background: #fff; }
+.services { gap: 1rem; }
+.services li { padding: 1.3rem 1.5rem; }
+form { background: var(--paper); }
+
+.steps { gap: 1.4rem; }
+.steps li { padding: 1.3rem 1.4rem 1.5rem; border: 2px solid var(--lime); border-radius: 8px; box-shadow: 5px 5px 0 var(--brass); }
+.steps li::before { display: none; }
+
+.detail { border: var(--edge); border-radius: 8px; box-shadow: 8px 8px 0 var(--ink); }
+.detail-close { border: var(--edge); border-radius: 4px; }
+.pull-tab { border: var(--edge); border-radius: 4px 4px 10px 10px; box-shadow: var(--hard); }
+.marquee { border-block: var(--edge); }
+
+.hero { overflow-x: clip; }
+.hero-art { overflow: visible; padding: 0 8px 8px 0; }
