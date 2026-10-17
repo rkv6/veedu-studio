@@ -70,35 +70,39 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
       const vel = (s.head - s.prev) / Math.max(dt, 0.001)
       s.prev = s.head
       s.flutter += (clamp(Math.abs(vel) / 900) - s.flutter) * (1 - Math.exp(-dt * 5))
-      const A = reduced ? 0 : 5 + 26 * s.flutter
+      const A = reduced ? 0 : 10 + 30 * s.flutter
       const p = clamp((s.head - headMin) / Math.max(1, headMax - headMin))
       const r = lerp(rMax, rMin, p)
       const y0 = rollCy + r - 10
       const hd = s.head
 
       const L: string[] = [], R: string[] = [], TL: string[] = [], TR: string[] = []
-      let lastL = 0, lastR = 0, lastY = 0, lastX = 0
+      let lastL = 0, lastR = 0, lastY = 0, lastX = 0, lastAng = 0
       const ys: number[] = []
-      for (let y = y0; y < hd; y += 10) ys.push(y)
+      for (let y = y0; y < hd; y += 8) ys.push(y)
       ys.push(hd)
-      ys.forEach((y, k) => {
+      // Centre line: a wave that travels down the tape like a snake. Both edges ride it together, the width never changes.
+      const cx = (y: number) => {
         const t = y - y0
-        const pin = smooth(t / 170)
-        // One-sided: the tape only ever bows to the right while it is pulled, it never swings back across the centre line
-        let sway = (reduced ? 0 : A * (0.62 + 0.38 * Math.sin(t * 0.012 - time * 2.4)) + A * 0.18 * Math.sin(t * 0.031 + time * 1.7)) * pin
-        const c = clamp((y - (hd - 110)) / 110)
-        sway += (reduced ? 0 : 1) * c * c * (12 + 30 * s.flutter)
-        const twist = reduced ? 1 : 0.55 + 0.45 * Math.abs(Math.cos(t * 0.009 - time * 0.9 + 0.7))
-        const w = stripW * lerp(0.6, 1, smooth(t / 90)) * twist
-        const x = xc + sway
-        const l = x - w / 2, rr = x + w / 2
-        const ins = Math.min(10, w * 0.2)
+        const pin = smooth(t / 200)
+        const w1 = Math.sin(t * 0.0105 - time * 3.1)
+        const w2 = 0.3 * Math.sin(t * 0.021 - time * 4.3 + 1.3)
+        return xc + (reduced ? 0 : A * (w1 + w2) * pin)
+      }
+      ys.forEach((y, k) => {
+        const x = cx(y)
+        const dx = cx(y + 2) - cx(y - 2)
+        const len = Math.hypot(dx, 4)
+        const nx = 4 / len, ny = -dx / len // unit normal to the centre line
+        const w = stripW * lerp(0.6, 1, smooth((y - y0) / 90)) / 2
+        const l = x - nx * w, lY = y - ny * w, rr = x + nx * w, rY = y + ny * w
+        const ins = Math.min(10, w * 0.4)
         const cmd = k === 0 ? 'M' : 'L'
-        L.push(`${cmd}${l.toFixed(1)} ${y.toFixed(1)}`)
-        R.push(`L${rr.toFixed(1)} ${y.toFixed(1)}`)
-        TL.push(`${cmd}${(l + ins).toFixed(1)} ${y.toFixed(1)}`)
-        TR.push(`${cmd}${(rr - ins).toFixed(1)} ${y.toFixed(1)}`)
-        lastL = l; lastR = rr; lastY = y; lastX = x
+        L.push(`${cmd}${l.toFixed(1)} ${lY.toFixed(1)}`)
+        R.push(`L${rr.toFixed(1)} ${rY.toFixed(1)}`)
+        TL.push(`${cmd}${(l + nx * ins).toFixed(1)} ${(lY + ny * ins).toFixed(1)}`)
+        TR.push(`${cmd}${(rr - nx * ins).toFixed(1)} ${(rY - ny * ins).toFixed(1)}`)
+        lastL = l; lastR = rr; lastY = (lY + rY) / 2; lastX = x; lastAng = Math.atan2(dx, 4)
       })
       const zig: string[] = []
       for (let k = 1; k < 6; k++) zig.push(`L${(lastL + ((lastR - lastL) * k) / 6).toFixed(1)} ${(lastY + (k % 2 ? 9 : -3)).toFixed(1)}`)
@@ -122,7 +126,7 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
         tabEl.classList.toggle('gone', text === '')
         tabEl.classList.toggle('idle', idle)
       }
-      const swing = reduced ? 0 : Math.sin(time * 2.1) * (3 + 8 * s.flutter)
+      const swing = reduced ? 0 : lastAng * 57.3 * 0.9 + Math.sin(time * 2.1) * 1.5
       tabEl.style.transform = `translate(${(lastX).toFixed(1)}px, ${(hd + 16).toFixed(1)}px) translateX(-50%) rotate(${swing.toFixed(1)}deg)`
 
       els.forEach((el, i) => {
