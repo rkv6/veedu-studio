@@ -1,5 +1,10 @@
-import { useEffect, useRef, type PointerEvent } from 'react'
+import { useRef, type PointerEvent } from 'react'
 import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
+import { scrollByY } from './smooth'
+import { SplitHeading } from './SplitHeading'
+
+gsap.registerPlugin(useGSAP)
 import { projects } from './data'
 
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v))
@@ -16,13 +21,12 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
   const end = useRef<HTMLDivElement>(null)
   const drag = useRef<number | null>(null)
 
-  useEffect(() => {
+  useGSAP(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const section = root.current!
     const svgEl = svg.current!
     const tabEl = tab.current!
     const film = svgEl.querySelector<SVGPathElement>('.film')!
-    const gloss = svgEl.querySelector<SVGPathElement>('.gloss')!
     const tickL = svgEl.querySelector<SVGPathElement>('.tick-l')!
     const tickR = svgEl.querySelector<SVGPathElement>('.tick-r')!
     const roll = svgEl.querySelector<SVGGElement>('.roll')!
@@ -98,7 +102,6 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
       for (let k = 1; k < 6; k++) zig.push(`L${(lastL + ((lastR - lastL) * k) / 6).toFixed(1)} ${(lastY + (k % 2 ? 9 : -3)).toFixed(1)}`)
       const d = `${L.join('')}${zig.join('')}${R.reverse().join('')}Z`
       film.setAttribute('d', d)
-      gloss.setAttribute('d', d)
       tickL.setAttribute('d', TL.join(''))
       tickR.setAttribute('d', TR.join(''))
 
@@ -140,7 +143,7 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
       ro.disconnect()
       window.removeEventListener('resize', measure)
     }
-  }, [])
+  }, { scope: root })
 
   const onDown = (e: PointerEvent<HTMLButtonElement>) => {
     drag.current = e.clientY
@@ -148,7 +151,7 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
   }
   const onMove = (e: PointerEvent<HTMLButtonElement>) => {
     if (drag.current === null) return
-    window.scrollBy(0, (e.clientY - drag.current) * 1.5)
+    scrollByY((e.clientY - drag.current) * 1.5, true)
     drag.current = e.clientY
   }
   const onUp = () => { drag.current = null }
@@ -162,16 +165,7 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
   return (
     <section className="unreel" id="projects" ref={root} aria-labelledby="h-projects">
       <svg className="unreel-svg" ref={svg} aria-hidden="true" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="film" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stopColor="#3b2e26" /><stop offset=".5" stopColor="#241b16" /><stop offset="1" stopColor="#35291f" />
-          </linearGradient>
-          <linearGradient id="sheen" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="90" y2="260" spreadMethod="repeat">
-            <stop offset="0" stopColor="#fff" stopOpacity="0" /><stop offset=".5" stopColor="#fff" stopOpacity=".11" /><stop offset="1" stopColor="#fff" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <path className="film" fill="url(#film)" stroke="#120d0a" strokeOpacity=".55" strokeLinejoin="round" />
-        <path className="gloss" fill="url(#sheen)" />
+        <path className="film" fill="#2b211b" stroke="#120d0a" strokeOpacity=".55" strokeLinejoin="round" />
         <path className="tick-l" fill="none" stroke="#8a7664" strokeWidth="4" strokeDasharray="2.5 10" />
         <path className="tick-r" fill="none" stroke="#8a7664" strokeWidth="4" strokeDasharray="2.5 10" />
         <g className="roll">
@@ -186,7 +180,7 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
       </svg>
 
       <div className="unreel-head" ref={head}>
-        <h2 id="h-projects">Pull the tape. See what we’ve finished.</h2>
+        <SplitHeading id="h-projects" text="Pull the tape." />
         <p>Every stop is a home we handed back, with the month the keys changed hands.</p>
       </div>
 
@@ -194,8 +188,8 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
         {projects.map((p, i) => (
           <li key={p.id} className={`u-item ${i % 2 ? 'right' : 'left'}`} style={{ gridRow: i + 1 }} ref={(el) => { items.current[i] = el }}>
             <a href={`#project-${p.id}`} onClick={open(p.id)}>
-              <span className="u-date">{p.done}</span>
               <span className="u-name">{p.name}</span>
+              <span className="u-date">{p.done}</span>
               <span className="u-meta">{p.place}, {p.scope}, {p.took}</span>
               <span className="u-note">{p.note}</span>
               <span className="u-link">See the whole story →</span>
@@ -213,7 +207,7 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
       <button
         className="pull-tab idle" ref={tab} aria-label="Pull the tape down to see the next project"
         onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}
-        onClick={() => { if (drag.current === null) window.scrollBy({ top: window.innerHeight * 0.6, behavior: 'smooth' }) }}
+        onClick={() => { if (drag.current === null) scrollByY(window.innerHeight * 0.6) }}
       >
         <span className="pull-label" ref={label}>Pull me</span>
       </button>

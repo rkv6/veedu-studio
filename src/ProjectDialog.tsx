@@ -12,7 +12,7 @@ export function ProjectDialog({ project, onClose, onEnquire }: { project: Projec
   }, [project])
 
   return (
-    <dialog ref={ref} className="detail" onClose={onClose} onClick={(e) => { if (e.target === ref.current) onClose() }} aria-labelledby="detail-title">
+    <dialog ref={ref} className="detail" data-lenis-prevent onClose={onClose} onClick={(e) => { if (e.target === ref.current) onClose() }} aria-labelledby="detail-title">
       {project && (
         <div className="detail-grid">
           <div className="detail-art"><RoomArt kind={project.kind} /></div>

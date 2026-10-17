@@ -2,8 +2,16 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { HouseArt, PlanArt } from './Art'
 import { Unreel } from './Unreel'
 import { Intro } from './Intro'
+import { Marquee } from './Marquee'
+import { SplitHeading } from './SplitHeading'
+import { lockScroll, scrollToTarget } from './smooth'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ProjectDialog } from './ProjectDialog'
 import { budgetBands, formatPrice, listings, projects, steps, typeFilters, type HomeType, type Project } from './data'
+
+gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 const PORTFOLIO = 'https://portfolio-rkv6.vercel.app/'
 
@@ -21,6 +29,7 @@ export default function App() {
   })
   const [openId, setOpenId] = useState<string | null>(null)
   const pushed = useRef(false)
+  const main = useRef<HTMLElement>(null)
   const idFromHash = () => {
     const m = window.location.hash.match(/^#project-(.+)$/)
     return m && projects.some((p) => p.id === m[1]) ? m[1] : null
@@ -33,7 +42,22 @@ export default function App() {
   }, [])
   useEffect(() => {
     document.documentElement.style.overflow = openId ? 'hidden' : ''
+    lockScroll(!!openId)
   }, [openId])
+
+  // Rise-in for the parts of each section, one batch per group, once. Content stays visible if script fails.
+  useGSAP(() => {
+    const mm = gsap.matchMedia()
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const parts = gsap.utils.toArray<HTMLElement>('.lead, .actions, .studio-main p, .services li, .steps li, .enq-copy p, .next li, form, .home-body, .plan-wrap')
+      gsap.set(parts, { autoAlpha: 0, y: 26 })
+      ScrollTrigger.batch(parts, {
+        start: 'top 90%', once: true,
+        onEnter: (els) => gsap.to(els, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'expo.out', stagger: 0.08, overwrite: true }),
+      })
+    })
+    return () => mm.revert()
+  }, { scope: main })
   const openProject = (id: string) => {
     window.history.pushState(null, '', `#project-${id}`)
     pushed.current = true
@@ -54,7 +78,7 @@ export default function App() {
   function enquire(label: string, kind = 'Buy a home') {
     setProperty(label)
     setInterest(kind)
-    document.getElementById('enquire')?.scrollIntoView({ behavior: 'smooth' })
+    scrollToTarget('#enquire')
   }
   function enquireProject(p: Project) {
     closeProject()
@@ -98,24 +122,26 @@ export default function App() {
         <a className="btn btn-sm" href="#enquire">Enquire</a>
       </header>
 
-      <main id="top">
+      <main id="top" ref={main}>
         <section className="hero">
           <div className="hero-copy">
-            <h1>Homes drawn for the way you <em>live.</em></h1>
+            <SplitHeading as="h1" now ready={!intro} text="Drawn for how you live." />
             <p className="lead">Veedu Studio designs interiors and helps families find a home to put them in, from Thiruvananthapuram down the coast to Kovalam and Varkala.</p>
             <div className="actions">
               <a className="btn" href="#homes">See homes for sale</a>
               <a className="btn btn-ghost" href="#enquire">Plan a site visit</a>
             </div>
           </div>
-          <div className="hero-art"><HouseArt /></div>
+          <div className="hero-art"><HouseArt slice /></div>
         </section>
 
         <Unreel onOpen={openProject} />
 
+        <Marquee />
+
         <section className="block tint" id="homes" aria-labelledby="h-homes">
           <div className="head">
-            <h2 id="h-homes">Homes waiting for a family</h2>
+            <SplitHeading id="h-homes" text="Homes waiting for a family" />
             <div className="filters">
               <div className="chips" role="group" aria-label="Home type">
                 {typeFilters.map((t) => (
@@ -156,7 +182,7 @@ export default function App() {
 
         <section className="block studio" id="studio" aria-labelledby="h-studio">
           <div className="studio-main">
-            <h2 id="h-studio">One team from the first sketch to the last switch</h2>
+            <SplitHeading id="h-studio" text="One team, sketch to switch." />
             <p>Most families hire a designer, then a contractor, then an electrician, and spend the year carrying messages between them. We keep the drawing, the carpenters and the site supervisor under one roof, so the room you approve is the room you get.</p>
             <p>The same team helps you find the home. We have walked the apartments, villas and plots listed here and can tell you what the brochure leaves out: where the water pressure drops, which side gets the monsoon, what a wall can and cannot take.</p>
           </div>
@@ -168,7 +194,7 @@ export default function App() {
         </section>
 
         <section className="block night" id="process" aria-labelledby="h-process">
-          <h2 id="h-process">How we roll</h2>
+          <SplitHeading id="h-process" text="How we roll" />
           <ol className="steps">
             {steps.map((s) => (
               <li key={s.title}><h3>{s.title}</h3><p>{s.text}</p></li>
@@ -178,7 +204,7 @@ export default function App() {
 
         <section className="block enquire" id="enquire" aria-labelledby="h-enq">
           <div className="enq-copy">
-            <h2 id="h-enq">Tell us what you are dreaming up</h2>
+            <SplitHeading id="h-enq" text="Tell us the dream." />
             <p>Send a few details and the conversation opens in WhatsApp, ready to send.</p>
             <ul className="next">
               <li><strong>The same day</strong><span>We reply on WhatsApp with a time for a site visit.</span></li>
