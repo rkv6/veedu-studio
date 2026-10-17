@@ -9,21 +9,42 @@ export interface Project {
   area: string
   budget: string
   note: string
+  done: string
+  took: string
+  brief: string
+  highlights: string[]
 }
 
+// Listed oldest to newest, the order the tape plays in.
 export const projects: Project[] = [
-  { id: 'p1', name: 'Mathew residence', place: 'Kowdiar', kind: 'living', scope: 'Living and dining', area: '1,850 sq ft', budget: '₹18 to 22 lakh', note: 'A teak-framed window wall, a sage sofa and one long dining table that seats ten when the family visits.' },
-  { id: 'p2', name: 'Thaara villa', place: 'Kovalam', kind: 'villa', scope: 'Whole home', area: '3,400 sq ft', budget: '₹55 to 70 lakh', note: 'Laterite walls kept bare, deep verandahs and rooms that open onto a central courtyard.' },
-  { id: 'p3', name: 'Nair kitchen', place: 'Pattom', kind: 'kitchen', scope: 'Modular kitchen', area: '220 sq ft', budget: '₹6 to 8 lakh', note: 'Moss green cabinets, a stone counter and a hood that actually clears the smoke from a tadka.' },
-  { id: 'p4', name: 'Sreya’s room', place: 'Vazhuthacaud', kind: 'bedroom', scope: 'Bedroom suite', area: '260 sq ft', budget: '₹3 to 4 lakh', note: 'A tall headboard, a study corner behind it and storage built into every spare wall.' },
-]
-
-export const projectFilters: { id: 'all' | RoomKind; label: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'living', label: 'Living' },
-  { id: 'kitchen', label: 'Kitchen' },
-  { id: 'bedroom', label: 'Bedroom' },
-  { id: 'villa', label: 'Villa' },
+  {
+    id: 'p1', name: 'Mathew residence', place: 'Kowdiar', kind: 'living', scope: 'Living and dining', area: '1,850 sq ft', budget: '₹18 to 22 lakh',
+    note: 'A teak-framed window wall, a sage sofa and one long dining table that seats ten when the family visits.',
+    done: 'February 2025', took: '9 weeks',
+    brief: 'A family of five wanted one open room that could handle a quiet Tuesday and a Sunday lunch for twenty. We took down a half wall, moved the dining table to the window and gave the sofa a corner of its own.',
+    highlights: ['Teak window frames kept from the old house', 'Dining table built on site, seats ten', 'Warm lighting on three separate circuits'],
+  },
+  {
+    id: 'p3', name: 'Nair kitchen', place: 'Pattom', kind: 'kitchen', scope: 'Modular kitchen', area: '220 sq ft', budget: '₹6 to 8 lakh',
+    note: 'Moss green cabinets, a stone counter and a hood that actually clears the smoke from a tadka.',
+    done: 'June 2025', took: '4 weeks',
+    brief: 'The old kitchen was dark and the hood barely worked. We rebuilt the layout around a single working triangle, added a proper chimney and gave every pot a home.',
+    highlights: ['Moss green marine ply cabinets', 'Ducted chimney with outdoor exhaust', 'Pull-out storage for tall vessels'],
+  },
+  {
+    id: 'p2', name: 'Thaara villa', place: 'Kovalam', kind: 'villa', scope: 'Whole home', area: '3,400 sq ft', budget: '₹55 to 70 lakh',
+    note: 'Laterite walls kept bare, deep verandahs and rooms that open onto a central courtyard.',
+    done: 'November 2025', took: '5 months',
+    brief: 'A coastal home for a couple who wanted the house to breathe. We left the laterite exposed, shaded every window with a deep verandah and opened each room to the courtyard.',
+    highlights: ['Exposed laterite, sealed not painted', 'Cross ventilation in every bedroom', 'Courtyard with a rain chain and a tulsi thara'],
+  },
+  {
+    id: 'p4', name: 'Sreya’s room', place: 'Vazhuthacaud', kind: 'bedroom', scope: 'Bedroom suite', area: '260 sq ft', budget: '₹3 to 4 lakh',
+    note: 'A tall headboard, a study corner behind it and storage built into every spare wall.',
+    done: 'August 2026', took: '3 weeks',
+    brief: 'A college student needed a bedroom that doubled as a study. The tall headboard hides a desk behind it, and the wardrobes run wall to wall so the floor stays clear.',
+    highlights: ['Desk and bookshelf behind the headboard', 'Full-height wardrobes with loft storage', 'Reading light on its own switch'],
+  },
 ]
 
 export type HomeType = 'Apartment' | 'Villa' | 'Plot'

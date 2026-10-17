@@ -1,27 +1,89 @@
-import { useMemo, useState, type FormEvent } from 'react'
-import { HouseArt, PlanArt, RoomArt } from './Art'
-import { budgetBands, formatPrice, listings, projectFilters, projects, steps, typeFilters, type HomeType, type RoomKind } from './data'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { PlanArt } from './Art'
+import { Sketchbook } from './Sketchbook'
+import { Unreel } from './Unreel'
+import { Intro } from './Intro'
+import { Marquee } from './Marquee'
+import { SplitHeading } from './SplitHeading'
+import { lockScroll, scrollToTarget } from './smooth'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ProjectDialog } from './ProjectDialog'
+import { budgetBands, formatPrice, listings, projects, steps, typeFilters, type HomeType, type Project } from './data'
+
+gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 const PORTFOLIO = 'https://portfolio-rkv6.vercel.app/'
 
 export default function App() {
-  const [pf, setPf] = useState<'all' | RoomKind>('all')
   const [tf, setTf] = useState<'All' | HomeType>('All')
   const [bf, setBf] = useState('any')
   const [interest, setInterest] = useState('Both')
   const [property, setProperty] = useState('')
   const [errors, setErrors] = useState<{ name?: string; phone?: string }>({})
 
-  const shownProjects = projects.filter((p) => pf === 'all' || p.kind === pf)
+  const [intro, setIntro] = useState(() => {
+    try {
+      return !window.matchMedia('(prefers-reduced-motion: reduce)').matches && !window.sessionStorage.getItem('veedu-intro')
+    } catch { return false }
+  })
+  const [openId, setOpenId] = useState<string | null>(null)
+  const pushed = useRef(false)
+  const main = useRef<HTMLElement>(null)
+  const idFromHash = () => {
+    const m = window.location.hash.match(/^#project-(.+)$/)
+    return m && projects.some((p) => p.id === m[1]) ? m[1] : null
+  }
+  useEffect(() => {
+    setOpenId(idFromHash())
+    const on = () => setOpenId(idFromHash())
+    window.addEventListener('popstate', on)
+    return () => window.removeEventListener('popstate', on)
+  }, [])
+  useEffect(() => {
+    document.documentElement.style.overflow = openId ? 'hidden' : ''
+    lockScroll(!!openId)
+  }, [openId])
+
+  // Rise-in for the parts of each section, one batch per group, once. Content stays visible if script fails.
+  useGSAP(() => {
+    const mm = gsap.matchMedia()
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const parts = gsap.utils.toArray<HTMLElement>('.lead, .actions, .studio-main p, .services li, .steps li, .enq-copy p, .next li, form, .home-body, .plan-wrap')
+      gsap.set(parts, { autoAlpha: 0, y: 26 })
+      ScrollTrigger.batch(parts, {
+        start: 'top 90%', once: true,
+        onEnter: (els) => gsap.to(els, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'expo.out', stagger: 0.08, overwrite: true }),
+      })
+    })
+    return () => mm.revert()
+  }, { scope: main })
+  const openProject = (id: string) => {
+    window.history.pushState(null, '', `#project-${id}`)
+    pushed.current = true
+    setOpenId(id)
+  }
+  const closeProject = () => {
+    if (!idFromHash()) { setOpenId(null); return }
+    if (pushed.current) { pushed.current = false; window.history.back() }
+    else { window.history.replaceState(null, '', window.location.pathname + window.location.search); setOpenId(null) }
+  }
+  const openProjectData = projects.find((p) => p.id === openId) ?? null
+
   const shownHomes = useMemo(() => {
     const band = budgetBands.find((b) => b.id === bf)!
     return listings.filter((l) => (tf === 'All' || l.type === tf) && band.test(l.lakh))
   }, [tf, bf])
 
-  function enquire(label: string) {
+  function enquire(label: string, kind = 'Buy a home') {
     setProperty(label)
-    setInterest('Buy a home')
-    document.getElementById('enquire')?.scrollIntoView({ behavior: 'smooth' })
+    setInterest(kind)
+    scrollToTarget('#enquire')
+  }
+  function enquireProject(p: Project) {
+    closeProject()
+    window.setTimeout(() => enquire(`Something like ${p.name}, ${p.place}`, 'Interior design'), 160)
   }
 
   function submit(e: FormEvent<HTMLFormElement>) {
@@ -48,6 +110,7 @@ export default function App() {
 
   return (
     <>
+      {intro && <Intro onDone={() => setIntro(false)} />}
       <a className="skip" href="#projects">Skip to projects</a>
       <header className="top">
         <a className="mark" href="#top" aria-label="Veedu Studio, home"><span>Veedu</span><small>Studio</small></a>
@@ -60,46 +123,26 @@ export default function App() {
         <a className="btn btn-sm" href="#enquire">Enquire</a>
       </header>
 
-      <main id="top">
+      <main id="top" ref={main}>
         <section className="hero">
           <div className="hero-copy">
-            <h1>Homes drawn for the way you <em>live.</em></h1>
+            <SplitHeading as="h1" now ready={!intro} text="Drawn for how you live." />
             <p className="lead">Veedu Studio designs interiors and helps families find a home to put them in, from Thiruvananthapuram down the coast to Kovalam and Varkala.</p>
             <div className="actions">
               <a className="btn" href="#homes">See homes for sale</a>
               <a className="btn btn-ghost" href="#enquire">Plan a site visit</a>
             </div>
           </div>
-          <div className="hero-art"><HouseArt /></div>
+          <div className="hero-art"><Sketchbook ready={!intro} /></div>
         </section>
 
-        <section className="block" id="projects" aria-labelledby="h-projects">
-          <div className="head">
-            <h2 id="h-projects">Interiors we have finished</h2>
-            <div className="chips" role="group" aria-label="Filter projects">
-              {projectFilters.map((f) => (
-                <button key={f.id} className="chip" aria-pressed={pf === f.id} onClick={() => setPf(f.id)}>{f.label}</button>
-              ))}
-            </div>
-          </div>
-          <ul className="projects">
-            {shownProjects.map((p) => (
-              <li key={p.id} className="project">
-                <div className="frame"><RoomArt kind={p.kind} /></div>
-                <div className="project-body">
-                  <h3>{p.name}</h3>
-                  <p className="where">{p.place}, {p.scope}</p>
-                  <p>{p.note}</p>
-                  <p className="facts"><span>{p.area}</span><span>{p.budget}</span></p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <Unreel onOpen={openProject} />
+
+        <Marquee />
 
         <section className="block tint" id="homes" aria-labelledby="h-homes">
           <div className="head">
-            <h2 id="h-homes">Homes we can show you</h2>
+            <SplitHeading id="h-homes" text="Homes waiting for a family" />
             <div className="filters">
               <div className="chips" role="group" aria-label="Home type">
                 {typeFilters.map((t) => (
@@ -139,15 +182,20 @@ export default function App() {
         </section>
 
         <section className="block studio" id="studio" aria-labelledby="h-studio">
-          <h2 id="h-studio">One team from the first sketch to the last switch</h2>
-          <div className="studio-cols">
+          <div className="studio-main">
+            <SplitHeading id="h-studio" text="One team, sketch to switch." />
             <p>Most families hire a designer, then a contractor, then an electrician, and spend the year carrying messages between them. We keep the drawing, the carpenters and the site supervisor under one roof, so the room you approve is the room you get.</p>
             <p>The same team helps you find the home. We have walked the apartments, villas and plots listed here and can tell you what the brochure leaves out: where the water pressure drops, which side gets the monsoon, what a wall can and cannot take.</p>
           </div>
+          <ul className="services">
+            <li><h3>Interior design</h3><p>Rooms, kitchens and whole homes, drawn and built by one team.</p></li>
+            <li><h3>Home search</h3><p>Apartments, villas and plots we have walked, with the honest notes.</p></li>
+            <li><h3>Site supervision</h3><p>A weekly progress report and one person to call when something is off.</p></li>
+          </ul>
         </section>
 
         <section className="block night" id="process" aria-labelledby="h-process">
-          <h2 id="h-process">How a project runs</h2>
+          <SplitHeading id="h-process" text="How we roll" />
           <ol className="steps">
             {steps.map((s) => (
               <li key={s.title}><h3>{s.title}</h3><p>{s.text}</p></li>
@@ -157,8 +205,13 @@ export default function App() {
 
         <section className="block enquire" id="enquire" aria-labelledby="h-enq">
           <div className="enq-copy">
-            <h2 id="h-enq">Tell us about the home</h2>
-            <p>Send a few details and the conversation opens in WhatsApp, ready to send. We reply the same day with a time for a site visit.</p>
+            <SplitHeading id="h-enq" text="Tell us the dream." />
+            <p>Send a few details and the conversation opens in WhatsApp, ready to send.</p>
+            <ul className="next">
+              <li><strong>The same day</strong><span>We reply on WhatsApp with a time for a site visit.</span></li>
+              <li><strong>Within a week</strong><span>We visit, measure and listen to how you live.</span></li>
+              <li><strong>In ten days</strong><span>You get a written plan with materials and prices.</span></li>
+            </ul>
           </div>
           <form onSubmit={submit} noValidate>
             <div className="row">
@@ -194,6 +247,8 @@ export default function App() {
           </form>
         </section>
       </main>
+
+      <ProjectDialog project={openProjectData} onClose={closeProject} onEnquire={enquireProject} />
 
       <footer className="foot">
         <p><strong>Veedu Studio</strong>, Thiruvananthapuram. A concept site for a fictional studio: the homes, prices and projects are made up.</p>
