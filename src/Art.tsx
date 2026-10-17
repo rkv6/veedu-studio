@@ -1,6 +1,6 @@
 import type { PlanRoom, RoomKind } from './data'
 
-const INK = '#1f1b17'
+const INK = '#14201b'
 
 export function HouseArt({ slice = false }: { slice?: boolean }) {
   const wins: [number, number, number, number][] = [
@@ -8,9 +8,9 @@ export function HouseArt({ slice = false }: { slice?: boolean }) {
   ]
   return (
     <svg viewBox="0 0 600 500" role="img" aria-label="Illustration of a sloped-roof Kerala house with a deep verandah and lit windows" preserveAspectRatio={slice ? 'xMidYMid slice' : 'xMidYMid meet'} className="art">
-      <rect width="600" height="500" fill="#f1e2c6" />
-      <circle cx="498" cy="96" r="48" fill="#e7b85c" />
-      <rect y="420" width="600" height="80" fill="#cfbf9f" />
+      <rect width="600" height="500" fill="#d9e6dc" />
+      <circle cx="498" cy="96" r="48" fill="#f0a81c" />
+      <rect y="420" width="600" height="80" fill="#b9c4a4" />
       <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
         <rect x="330" y="255" width="215" height="165" fill="#f8f3e9" />
         <polygon points="312,262 438,168 564,262" fill="#8c3a22" />
@@ -50,21 +50,21 @@ export function RoomArt({ kind }: { kind: RoomKind }) {
     <svg viewBox="0 0 400 300" role="img" aria-label={`Illustration of a ${kind} interior`} preserveAspectRatio="xMidYMid slice" className="art">
       {kind === 'living' && (
         <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
-          <rect width="400" height="300" fill="#eadfca" />
+          <rect width="400" height="300" fill="#dde5d2" />
           <rect y="214" width="400" height="86" fill="#b98a5a" />
           <rect x="40" y="36" width="116" height="124" fill="#cfe0d8" /><line x1="98" y1="36" x2="98" y2="160" strokeWidth="1.8" /><line x1="40" y1="98" x2="156" y2="98" strokeWidth="1.8" />
-          <rect x="210" y="52" width="76" height="56" fill="#a4452a" /><rect x="224" y="64" width="48" height="32" fill="#e7b85c" />
+          <rect x="210" y="52" width="76" height="56" fill="#a4452a" /><rect x="224" y="64" width="48" height="32" fill="#f0a81c" />
           <ellipse cx="260" cy="262" rx="130" ry="22" fill="#d6c3a0" />
           <rect x="176" y="124" width="190" height="52" rx="12" fill="#6f7d62" />
           <rect x="166" y="150" width="210" height="62" rx="12" fill="#7f8e72" />
           <rect x="166" y="150" width="26" height="62" rx="10" fill="#6f7d62" /><rect x="350" y="150" width="26" height="62" rx="10" fill="#6f7d62" />
-          <line x1="64" y1="212" x2="64" y2="150" /><path d="M46 150h36l-8-32H54Z" fill="#e7b85c" />
+          <line x1="64" y1="212" x2="64" y2="150" /><path d="M46 150h36l-8-32H54Z" fill="#f0a81c" />
           <rect x="204" y="226" width="110" height="18" rx="4" fill="#7a5238" />
         </g>
       )}
       {kind === 'kitchen' && (
         <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
-          <rect width="400" height="300" fill="#efe6d6" />
+          <rect width="400" height="300" fill="#e3ebdc" />
           <rect y="236" width="400" height="64" fill="#cdbb9a" />
           <rect x="16" y="34" width="150" height="76" fill="#3f5a4b" /><rect x="234" y="34" width="150" height="76" fill="#3f5a4b" />
           <line x1="91" y1="34" x2="91" y2="110" strokeWidth="1.8" /><line x1="309" y1="34" x2="309" y2="110" strokeWidth="1.8" />
@@ -78,9 +78,9 @@ export function RoomArt({ kind }: { kind: RoomKind }) {
       )}
       {kind === 'bedroom' && (
         <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
-          <rect width="400" height="300" fill="#e6d6c2" />
+          <rect width="400" height="300" fill="#d8e0d0" />
           <rect y="226" width="400" height="74" fill="#b98a5a" />
-          <line x1="200" y1="0" x2="200" y2="44" /><path d="M170 76a30 30 0 0 1 60 0Z" fill="#e7b85c" />
+          <line x1="200" y1="0" x2="200" y2="44" /><path d="M170 76a30 30 0 0 1 60 0Z" fill="#f0a81c" />
           <rect x="100" y="84" width="200" height="118" rx="10" fill="#7a5238" />
           <rect x="84" y="174" width="232" height="66" rx="8" fill="#f6f1e7" />
           <rect x="108" y="150" width="76" height="36" rx="10" fill="#fffdf8" /><rect x="216" y="150" width="76" height="36" rx="10" fill="#fffdf8" />
@@ -103,7 +103,7 @@ export function PlanArt({ rooms, name }: { rooms: PlanRoom[]; name: string }) {
       </defs>
       {rooms.map((r, i) => (
         <g key={i}>
-          <rect x={r.x} y={r.y} width={r.w} height={r.h} fill={r.court ? 'url(#hatch)' : r.label.startsWith('Plot') ? '#e9e0cc' : r.label === 'Approved plan' ? '#f8f3e9' : '#f8f3e9'} stroke={INK} strokeWidth={r.label.startsWith('Plot') ? 2.2 : 1.6} strokeDasharray={r.label === 'Approved plan' ? '5 3' : undefined} />
+          <rect x={r.x} y={r.y} width={r.w} height={r.h} fill={r.court ? 'url(#hatch)' : r.label.startsWith('Plot') ? '#cfd7c3' : r.label === 'Approved plan' ? '#f8f3e9' : '#f8f3e9'} stroke={INK} strokeWidth={r.label.startsWith('Plot') ? 2.2 : 1.6} strokeDasharray={r.label === 'Approved plan' ? '5 3' : undefined} />
           <text x={r.x + r.w / 2} y={r.label.startsWith('Plot') ? r.y + 12 : r.y + r.h / 2 + 2.5} textAnchor="middle" fontSize="7.5" fill={INK} fontWeight="600">{r.label}</text>
         </g>
       ))}

@@ -165,16 +165,16 @@ export function Unreel({ onOpen }: { onOpen: (id: string) => void }) {
   return (
     <section className="unreel" id="projects" ref={root} aria-labelledby="h-projects">
       <svg className="unreel-svg" ref={svg} aria-hidden="true" preserveAspectRatio="none">
-        <path className="film" fill="#2b211b" stroke="#120d0a" strokeOpacity=".55" strokeLinejoin="round" />
-        <path className="tick-l" fill="none" stroke="#8a7664" strokeWidth="4" strokeDasharray="2.5 10" />
-        <path className="tick-r" fill="none" stroke="#8a7664" strokeWidth="4" strokeDasharray="2.5 10" />
+        <path className="film" fill="#17221d" stroke="#0b120f" strokeOpacity=".55" strokeLinejoin="round" />
+        <path className="tick-l" fill="none" stroke="#8fa398" strokeWidth="4" strokeDasharray="2.5 10" />
+        <path className="tick-r" fill="none" stroke="#8fa398" strokeWidth="4" strokeDasharray="2.5 10" />
         <g className="roll">
-          <circle className="roll-wound" fill="#2b211b" stroke="#120d0a" strokeWidth="1.5" />
-          {[0, 1, 2, 3].map((i) => <circle key={i} className="roll-ring" fill="none" stroke="#5a483c" strokeOpacity=".55" strokeWidth="1.5" />)}
+          <circle className="roll-wound" fill="#17221d" stroke="#0b120f" strokeWidth="1.5" />
+          {[0, 1, 2, 3].map((i) => <circle key={i} className="roll-ring" fill="none" stroke="#4a5f55" strokeOpacity=".55" strokeWidth="1.5" />)}
           <g className="roll-spin">
-            <circle r="20" fill="#f1e9db" />
-            {[0, 120, 240].map((a) => <rect key={a} x="-3" y="-20" width="6" height="11" fill="#1d1a17" transform={`rotate(${a})`} />)}
-            <circle r="6" fill="#1d1a17" />
+            <circle r="20" fill="#e8ece2" />
+            {[0, 120, 240].map((a) => <rect key={a} x="-3" y="-20" width="6" height="11" fill="#14201b" transform={`rotate(${a})`} />)}
+            <circle r="6" fill="#14201b" />
           </g>
         </g>
       </svg>
