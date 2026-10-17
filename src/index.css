@@ -264,3 +264,16 @@ h3 { font-size: 1.4rem; line-height: 1.05; }
 
 .u-item.in a, .u-item.left.in a, .u-item.right.in a { transform: none; }
 @media (max-width: 759px) { .pull-tab { font-size: .82rem; padding: .5rem .7rem; } }
+
+/* Hero sketchbook */
+.hero-art { background: none; border-radius: 0; }
+.sketchbook { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: .6rem; height: 100%; }
+.sketchbook .tile { background: #f6f7f1; border-radius: 18px; overflow: hidden; position: relative; min-height: 0; }
+.sketchbook .tile.tall { grid-row: 1 / span 2; border-radius: 18px 18px 18px 90px; }
+.sketchbook .tile svg { position: absolute; inset: .6rem; width: calc(100% - 1.2rem); height: calc(100% - 1.2rem); display: block; }
+.sketchbook .rough { filter: url(#rough); }
+.sketchbook .ink { stroke: #14201b; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.sketchbook .ink:not([fill]) { fill: none; }
+.sketchbook .ink.thin { stroke-width: 1; }
+.sketchbook .wash { stroke: none; }
+@media (max-width: 960px) { .hero-art { height: 460px; } }

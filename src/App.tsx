@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { HouseArt, PlanArt } from './Art'
+import { PlanArt } from './Art'
+import { Sketchbook } from './Sketchbook'
 import { Unreel } from './Unreel'
 import { Intro } from './Intro'
 import { Marquee } from './Marquee'
@@ -132,7 +133,7 @@ export default function App() {
               <a className="btn btn-ghost" href="#enquire">Plan a site visit</a>
             </div>
           </div>
-          <div className="hero-art"><HouseArt slice /></div>
+          <div className="hero-art"><Sketchbook ready={!intro} /></div>
         </section>
 
         <Unreel onOpen={openProject} />
